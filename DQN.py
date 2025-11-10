@@ -116,7 +116,7 @@ class DQNAgent:
         self.target_net.load_state_dict(self.policy_net.state_dict())
 
     def save(self):
-        self.MODEL_SAVE_PATH = "DQN_" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".pth"
+        self.MODEL_SAVE_PATH = "record/DQN_" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".pth"
         torch.save({
             'policy_state_dict': self.policy_net.state_dict(),
             'target_state_dict': self.target_net.state_dict(),

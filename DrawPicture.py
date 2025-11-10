@@ -20,9 +20,10 @@ def save_training_data(filename, **kwargs):
     print(f"Data saved to {filename} ({', '.join(kwargs.keys())})")
 
 
-def plot_training_data(filename):
+def plot_training_data(filename, save='n'):
     """
     Plot only numeric list data from JSON file (ignore static attributes).
+    If save == 'y', save the plot as a PNG file instead of displaying it.
     """
     with open(filename, "r") as f:
         data = json.load(f)
@@ -41,11 +42,18 @@ def plot_training_data(filename):
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.show()
 
+    if save.lower() == 'y':
+        output_file = os.path.splitext(filename)[0] + ".png"
+        plt.savefig(output_file, dpi=300)
+        print(f"Plot saved to {output_file}")
+    else:
+        plt.show()
+
+    plt.close()
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python3 DrawPicture.py record/[filename].json")
+    if len(sys.argv) != 3:
+        print("Usage: python3 DrawPicture.py record/[filename].json [Save file(y/n)]")
         sys.exit(0)
-    plot_training_data(sys.argv[1])
+    plot_training_data(sys.argv[1], sys.argv[2][:1])
