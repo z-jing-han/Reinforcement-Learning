@@ -10,6 +10,7 @@ import gymnasium as gym
 import time
 import os
 from DrawPicture import save_training_data
+from BaseAgent import BaseAgent
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -58,9 +59,9 @@ class QNetwork(nn.Module):
 # ----------------------
 # Agent (DQN)
 # ----------------------
-class DQNAgent:
-    def __init__(self, env_name = "CartPole-v1", gamma = 0.99, lr = 1e-3, BUFFER_CAPACITY = 50000, MAX_EPISODES = 5000, MAX_STEPS_PER_EPISODE = 500, BATCH_SIZE = 64):
-        self.env_name = env_name
+class DQNAgent(BaseAgent):
+    def __init__(self, env_name = "CartPole-v1", gamma = 0.99, lr = 1e-3, BUFFER_CAPACITY = 50000, episodes = 5000, MAX_STEPS_PER_EPISODE = 500, BATCH_SIZE = 64):
+        super().__init__(env_name, episodes)
         env = gym.make(self.env_name)
         obs_dim = env.observation_space.shape[0]
         self.n_actions = env.action_space.n
@@ -70,9 +71,7 @@ class DQNAgent:
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=lr)
         self.BUFFER_CAPACITY = BUFFER_CAPACITY
         self.replay = ReplayBuffer(self.BUFFER_CAPACITY)
-        self.steps_done = 0
         self.gamma = gamma
-        self.MAX_EPISODES = MAX_EPISODES
         self.MAX_STEPS_PER_EPISODE = MAX_STEPS_PER_EPISODE
         self.BATCH_SIZE = BATCH_SIZE
         self.MODEL_SAVE_PATH = None
@@ -148,7 +147,7 @@ class DQNAgent:
             state = next_state if not done else env.reset()[0]
 
         print("Start training")
-        for ep in range(1, self.MAX_EPISODES + 1):
+        for ep in range(1, self.episodes + 1):
             state, _ = env.reset()
             ep_reward = 0
             for t in range(self.MAX_STEPS_PER_EPISODE):
@@ -194,7 +193,7 @@ class DQNAgent:
 # ----------------------
 if __name__ == "__main__":
     start_time = time.time()
-    agent = DQNAgent(env_name="CartPole-v1", gamma=0.99, lr=1e-3, BUFFER_CAPACITY=50000, MAX_EPISODES=5000, MAX_STEPS_PER_EPISODE=500)
+    agent = DQNAgent(env_name="CartPole-v1", gamma=0.99, lr=1e-3, BUFFER_CAPACITY=50000, episodes=5000, MAX_STEPS_PER_EPISODE=500)
     rewards = agent.train(MIN_REPLAY_SIZE=1000, EPS_START=1.0, EPS_END=0.02, EPS_DECAY=20000)
     elapsed = time.time() - start_time
     print(f"Training finished, elapsed {elapsed/60:.2f} min")
